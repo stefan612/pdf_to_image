@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+#Lst - Converts given pdf's via nemo right click on pdf to png images
 import os
 import sys
 from pdf2image import convert_from_path
