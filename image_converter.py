@@ -30,9 +30,7 @@ def convert_image(input_path, output_format):
         print(output_path)
         # Convert and save image
         if output_format.lower() in ['jpg', 'jpeg', 'png', 'gif']:
-            print("fuck3")
             img.save(output_path)
-            print("fuck4")
         elif output_format.lower() == 'ico':
             img = img.resize((64, 64), Image.LANCZOS)
             img.save(output_path)
