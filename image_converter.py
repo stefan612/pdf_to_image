@@ -22,24 +22,36 @@ def convert_image(input_path, output_format):
         img = Image.open(input_path)
         print("Starte Konvertierung nach:", output_format)
         # Resize image to 64x64
-        img.thumbnail((64, 64), Image.LANCZOS)
+        #img.thumbnail((64, 64), Image.LANCZOS)
 
         # Determine output path
         base = os.path.splitext(input_path)[0]
         output_path = f"{base}.{output_format.lower()}"
         print(output_path)
         # Convert and save image
-        if output_format.lower() in ['jpg', 'jpeg', 'png', 'gif']:
-            img.save(output_path)
+        if output_format.lower() in ['jpg', 'jpeg']:
+            if img.mode in ('RGBA', 'LA'):
+                img = img.convert('RGB')
+            img.save(output_path, 'JPEG')
+            print(f"Image (JPG) saved successfully: {output_path}")
+        elif output_format.lower() == 'png':
+            img.save(output_path, 'PNG')
+            print(f"Image (PNG) saved successfully: {output_path}")
+        elif output_format.lower() == 'gif':
+            img.save(output_path, 'GIF')
+            print(f"Image (GIF) saved successfully: {output_path}")
         elif output_format.lower() == 'ico':
             img = img.resize((64, 64), Image.LANCZOS)
             img.save(output_path)
         elif output_format.lower() == 'pdf':
             temp_img_path = f"{base}_temp.jpg"
+            if img.mode in ('RGBA', 'LA'):
+                img = img.convert('RGB')
             img.save(temp_img_path, 'JPEG')
             with open(output_path, 'wb') as f:
                 f.write(img2pdf.convert(temp_img_path))
             os.remove(temp_img_path)
+            print(f"PDF saved successfully: {output_path}")
         else:
             print("Unsupported format!")
             return
