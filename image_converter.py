@@ -69,7 +69,11 @@ if __name__ == "__main__":
         print("Usage: python3 image_converter.py <input_image_path>")
     else:
         input_image_path = sys.argv[1]
+
+        # Split the input paths by '#'
+        paths_list = input_image_path.split('#')
+
         chosen_format = show_format_selection_dialog()
-        print(chosen_format)
         if chosen_format:
-            convert_image(input_image_path, chosen_format)
+            for path in paths_list:
+                convert_image(path.strip(), chosen_format)
