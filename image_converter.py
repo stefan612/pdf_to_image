@@ -4,46 +4,43 @@ import img2pdf
 import subprocess
 import os
 
-
 def show_format_selection_dialog():
     try:
-        # Create a Zenity list dialog to choose the format
-        output_format = subprocess.check_output(
-            ['zenity', '--list', '--title=Select Output Format', '--column=Format', 'PNG', 'JPG', 'PDF', 'ICO']).decode(
-            'utf-8').strip()
-        return output_format.lower()  # Return the selected format in lowercase
+        output_format = subprocess.check_output([
+            'zenity', '--list', '--title=Select Output Format', '--column=Format', 'PNG', 'JPG', 'PDF', 'ICO'
+        ]).decode('utf-8').strip()
+        return output_format.lower()
     except subprocess.CalledProcessError:
         return None
 
+def show_file_selection_dialog():
+    try:
+        file_paths = subprocess.check_output([
+            'zenity', '--file-selection', '--multiple', '--separator=|', '--title=Select Image Files'
+        ]).decode('utf-8').strip()
+        return file_paths.split('|') if file_paths else []
+    except subprocess.CalledProcessError:
+        return []
 
 def convert_image(input_path, output_format):
     try:
-        # Load image
         img = Image.open(input_path)
-        print("Starte Konvertierung nach:", output_format)
-        # Resize image to 64x64
-        #img.thumbnail((64, 64), Image.LANCZOS)
-
-        # Determine output path
+        print(f"Starting conversion of {input_path} to {output_format}")
         base = os.path.splitext(input_path)[0]
-        output_path = f"{base}.{output_format.lower()}"
-        print(output_path)
-        # Convert and save image
-        if output_format.lower() in ['jpg', 'jpeg']:
+        output_path = f"{base}.{output_format}"
+        
+        if output_format in ['jpg', 'jpeg']:
             if img.mode in ('RGBA', 'LA'):
                 img = img.convert('RGB')
             img.save(output_path, 'JPEG')
-            print(f"Image (JPG) saved successfully: {output_path}")
-        elif output_format.lower() == 'png':
+        elif output_format == 'png':
             img.save(output_path, 'PNG')
-            print(f"Image (PNG) saved successfully: {output_path}")
-        elif output_format.lower() == 'gif':
+        elif output_format == 'gif':
             img.save(output_path, 'GIF')
-            print(f"Image (GIF) saved successfully: {output_path}")
-        elif output_format.lower() == 'ico':
+        elif output_format == 'ico':
             img = img.resize((64, 64), Image.LANCZOS)
-            img.save(output_path)
-        elif output_format.lower() == 'pdf':
+            img.save(output_path, format='ICO')
+        elif output_format == 'pdf':
             temp_img_path = f"{base}_temp.jpg"
             if img.mode in ('RGBA', 'LA'):
                 img = img.convert('RGB')
@@ -51,28 +48,26 @@ def convert_image(input_path, output_format):
             with open(output_path, 'wb') as f:
                 f.write(img2pdf.convert(temp_img_path))
             os.remove(temp_img_path)
-            print(f"PDF saved successfully: {output_path}")
         else:
-            print("Unsupported format!")
+            print(f"Unsupported format: {output_format}")
             return
-
+        
         print(f"Converted {input_path} to {output_path}")
     except Exception as e:
-        print(f"Error: {e}")
-
+        print(f"Error converting {input_path}: {e}")
 
 if __name__ == "__main__":
-    print(sys.argv[1])
-    print(len(sys.argv))
-    if len(sys.argv) != 2:
-        print("Usage: python3 image_converter.py <input_image_path>")
-    else:
-        input_image_path = sys.argv[1]
+    # Use files from command-line args (from Nemo) instead of opening a selection dialog
+    file_paths = sys.argv[1:]  # Get file paths from command line arguments
+    
+    if not file_paths:
+        file_paths = show_file_selection_dialog()  # Fallback to manual selection if none provided
 
-        # Split the input paths by '#'
-        paths_list = input_image_path.split('#')
+    if not file_paths:
+        print("No files selected.")
+        sys.exit(1)
 
-        chosen_format = show_format_selection_dialog()
-        if chosen_format:
-            for path in paths_list:
-                convert_image(path.strip(), chosen_format)
+    chosen_format = show_format_selection_dialog()
+    if chosen_format:
+        for path in file_paths:
+            convert_image(path.strip(), chosen_format)
