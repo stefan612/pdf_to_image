@@ -1,8 +1,8 @@
 [Nemo Action]
 Name=Convert Image
 Comment=Convert image to jpg, png, pdf, gif, or ico
-#Exec=python3 ~/GitReposStefan/pdf_to_image/image_converter.py "%F" &
-Exec=gnome-terminal -- bash -c 'python3 ~/GitReposStefan/pdf_to_image/image_converter.py %F; exit'
+#Exec=python3 /home/stefan/GitReposStefan/pdf_to_image/image_converter.py "%F" &
+Exec=gnome-terminal -- bash -c 'python3 home/stefan/GitReposStefan/pdf_to_image/image_converter.py %F; exit'
 Icon-Name=image
 Selection=any
 Extensions=png;jpg;jpeg;gif;bmp;tiff;ico

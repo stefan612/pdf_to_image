@@ -1,0 +1,4 @@
+#!/bin/bash
+for FILE in "$@"; do
+    /home/stefan/GitReposStefan/pdf_to_image/pdf_to_images.py "$FILE"
+done
