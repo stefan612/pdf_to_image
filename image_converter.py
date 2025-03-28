@@ -7,11 +7,14 @@ import os
 def show_format_selection_dialog():
     try:
         output_format = subprocess.check_output([
-            'zenity', '--list', '--title=Select Output Format', '--column=Format', 'PNG', 'JPG', 'PDF', 'ICO'
+            'zenity', '--list', '--title=Select Output Format', '--column=Format',
+            'PNG', 'JPG', 'PDF', 'ICO', 'GIF', 'BMP', 'TIFF',
+            '--height=450'  # Set the height of the dialog
         ]).decode('utf-8').strip()
         return output_format.lower()
     except subprocess.CalledProcessError:
         return None
+
 
 def show_file_selection_dialog():
     try:
@@ -48,6 +51,10 @@ def convert_image(input_path, output_format):
             with open(output_path, 'wb') as f:
                 f.write(img2pdf.convert(temp_img_path))
             os.remove(temp_img_path)
+        elif output_format == 'tiff':
+            img.save(output_path, 'TIFF')
+        elif output_format == 'bmp':
+            img.save(output_path, 'BMP')
         else:
             print(f"Unsupported format: {output_format}")
             return
